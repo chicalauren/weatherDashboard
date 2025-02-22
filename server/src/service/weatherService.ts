@@ -36,9 +36,9 @@ class WeatherService {
   apiKey: string;
   cityName: string;
 
-  constructor(cityName: string) {
-    this.baseURL = `${process.env.API_BASE_URL}`
-    this.apiKey = `${process.env.API_KEY}`
+  constructor(baseURL: string, apiKey: string, cityName: string) {
+    this.baseURL = baseURL;
+    this.apiKey = apiKey;
     this.cityName = cityName
   }
 
@@ -154,4 +154,4 @@ private parseForecast(response: any) {
 }
 
 // export WeatherService
-export default new WeatherService('');
+export default WeatherService;
