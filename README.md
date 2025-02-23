@@ -15,19 +15,19 @@ This is used to check the current weather as well as a 5 day forecast for search
 ## Installation
 
 ```sh
-# Clone the repository
+Clone the repository
 
-# Navigate to the project directory
+Navigate to the project directory
 
-# Install dependencies
+Install dependencies
 
-# node.js will be necessary
+node.js will be necessary
 ```
 
 ## Usage
 
 ```sh
-# Run the project
+Run the project
 npm run start:dev
 ```
 
