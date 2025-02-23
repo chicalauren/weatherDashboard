@@ -1,18 +1,19 @@
 import { Router, type Request, type Response } from 'express';
 const router = Router();
 
-import HistoryService from '../../service/historyService';
-import WeatherService from '../../service/weatherService';
+import HistoryService from '../../service/historyService.js';
+import WeatherService from '../../service/weatherService.js';
 
 // POST Request with city name to retrieve weather data
-router.post('/', (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   const city = req.body.cityName
   // GET weather data from city name
-  new WeatherService('openweathermap.org', 'e0f2a8b6cdfb676ec11d04660c9d6835', city)
+  new WeatherService(city)
   // Save city to search history
   HistoryService.addCity(city)
   // Send weather data to client
-  res.json({message: "City added to history"});
+  const weather =new WeatherService(city)
+  res.json(await weather.getWeatherForCity())
 });
 
 // GET search history

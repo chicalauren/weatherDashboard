@@ -19,12 +19,12 @@ class Weather {
 
   constructor(city: string, date: string, icon: string, iconDescription: string, tempF: number, windSpeed: number, humidity: number) {
     this.city = city,
-    this.date = date,
-    this.icon = icon,
-    this.iconDescription = iconDescription,
-    this.tempF = tempF,
-    this.windSpeed = windSpeed,
-    this.humidity = humidity
+      this.date = date,
+      this.icon = icon,
+      this.iconDescription = iconDescription,
+      this.tempF = tempF,
+      this.windSpeed = windSpeed,
+      this.humidity = humidity
   }
 
 }
@@ -36,9 +36,9 @@ class WeatherService {
   apiKey: string;
   cityName: string;
 
-  constructor(baseURL: string, apiKey: string, cityName: string) {
-    this.baseURL = baseURL;
-    this.apiKey = apiKey;
+  constructor(cityName: string) {
+    this.baseURL = process.env.API_BASE_URL || ""
+    this.apiKey = process.env.API_KEY || ""
     this.cityName = cityName
   }
 
@@ -49,11 +49,11 @@ class WeatherService {
 
     if (!response.ok) {
       console.log('could not fetch location data')
-    return []
+      return []
     }
     else {
-    const coordinates:Coordinates[] = await response.json()
-    return coordinates
+      const coordinates: Coordinates[] = await response.json()
+      return coordinates
     }
   }
 
@@ -63,12 +63,12 @@ class WeatherService {
     try {
       const lat = locationData[0].lat
       const lon = locationData[0].lon
-      return {lat: lat, lon: lon}
-      
+      return { lat: lat, lon: lon }
+
     } catch (error) {
       console.error(`location not found`)
       this.cityName = `location not found`
-      return {lat: 90, lon: 0}
+      return { lat: 90, lon: 0 }
     }
   }
 
@@ -88,7 +88,7 @@ class WeatherService {
   // fetchAndDestructureLocationData method
   // private async fetchAndDestructureLocationData() {}
   private async fetchAndDestructureLocationData() {
-    return  this.destructureLocationData(await this.fetchLocationData(this.buildGeocodeQuery()))
+    return this.destructureLocationData(await this.fetchLocationData(this.buildGeocodeQuery()))
   }
 
   // fetchWeatherData method
@@ -96,7 +96,7 @@ class WeatherService {
   private async fetchWeatherData(coordinates: Coordinates) {
     const currentWeather = await (await fetch(`https://api.openweathermap.org/data/2.5/weather?${this.buildWeatherQuery(coordinates)}`)).json()
     const forecast = await (await fetch(`https://api.openweathermap.org/data/2.5/forecast?${this.buildWeatherQuery(coordinates)}`)).json()
-    return {currentWeather: currentWeather, forecast: forecast}
+    return { currentWeather: currentWeather, forecast: forecast }
   }
 
   // parseCurrentWeather method
@@ -104,25 +104,25 @@ class WeatherService {
   private parseCurrentWeather(response: any) {
     const current = response
     let name
-    if (this.cityName === `location not found`) {name = `Location not found, here's the north pole instead!`}
-    else {name = response.name}
-  return new Weather(name, `${(new Date()).toDateString()}`, current.weather[0].icon, current.weather[0].description, current.main.temp, current.wind.speed, current.main.humidity)
-  
-}
+    if (this.cityName === `location not found`) { name = `Location not found, here's the north pole instead!` }
+    else { name = response.name }
+    return new Weather(name, `${(new Date()).toDateString()}`, current.weather[0].icon, current.weather[0].description, current.main.temp, current.wind.speed, current.main.humidity)
 
-private parseForecast(response: any) {
-  const daysUnfiltered: any[] = response.list
-  const days: any[] = daysUnfiltered.filter((entry: any) => entry.dt_txt.includes(`12:00:00`))
-  const forecast: Weather[] = []
-  let name
-  if (this.cityName === `location not found`) {name = `Location not found`}
-  else {name = response.name}
-  for (const day of days) {
-    const weather = new Weather(name, day.dt_txt.slice(0, -9), day.weather[0].icon, day.weather[0].description, day.main.temp, day.wind.speed, day.main.humidity)
-    forecast.push(weather)
   }
-  return forecast
-}
+
+  private parseForecast(response: any) {
+    const daysUnfiltered: any[] = response.list
+    const days: any[] = daysUnfiltered.filter((entry: any) => entry.dt_txt.includes(`12:00:00`))
+    const forecast: Weather[] = []
+    let name
+    if (this.cityName === `location not found`) { name = `Location not found` }
+    else { name = response.name }
+    for (const day of days) {
+      const weather = new Weather(name, day.dt_txt.slice(0, -9), day.weather[0].icon, day.weather[0].description, day.main.temp, day.wind.speed, day.main.humidity)
+      forecast.push(weather)
+    }
+    return forecast
+  }
 
 
   // buildForecastArray method
@@ -136,16 +136,17 @@ private parseForecast(response: any) {
   // getWeatherForCity method
   // async getWeatherForCity(city: string) {}
   async getWeatherForCity() {
-    try {const locationData = await this.fetchAndDestructureLocationData()
+    try {
+      const locationData = await this.fetchAndDestructureLocationData()
       const combinedWeatherData = await this.fetchWeatherData(locationData)
-      
+
       const current = this.parseCurrentWeather(combinedWeatherData.currentWeather)
       const forecast = this.parseForecast(combinedWeatherData.forecast)
-  
+
       const weather = this.buildForecastArray(current, forecast)
       return weather;
-   
-      
+
+
     } catch (error) {
       console.error(`there was an error getting weather data`)
       return

@@ -14,9 +14,9 @@ class Weather {
 }
 // WeatherService class
 class WeatherService {
-    constructor(baseURL, apiKey, cityName) {
-        this.baseURL = baseURL;
-        this.apiKey = apiKey;
+    constructor(cityName) {
+        this.baseURL = process.env.API_BASE_URL || "";
+        this.apiKey = process.env.API_KEY || "";
         this.cityName = cityName;
     }
     // fetchLocationData method
